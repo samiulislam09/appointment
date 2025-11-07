@@ -1,0 +1,90 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Book Appointment{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Book New Appointment</h2>
+    
+    {% if form.non_field_errors %}
+        <div style="background-color: #f8d7da; color: #721c24; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.provider.id_for_label }}">Service Provider: *</label>
+            {{ form.provider }}
+            {% if form.provider.errors %}
+                <small style="color: red; display: block; margin-top: 0.25rem;">{{ form.provider.errors.0 }}</small>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.date.id_for_label }}">Date: *</label>
+            {{ form.date }}
+            {% if form.date.errors %}
+                <small style="color: red; display: block; margin-top: 0.25rem;">{{ form.date.errors.0 }}</small>
+            {% endif %}
+            <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Select a future date</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.start_time.id_for_label }}">Start Time: *</label>
+            {{ form.start_time }}
+            {% if form.start_time.errors %}
+                <small style="color: red; display: block; margin-top: 0.25rem;">{{ form.start_time.errors.0 }}</small>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.end_time.id_for_label }}">End Time: *</label>
+            {{ form.end_time }}
+            {% if form.end_time.errors %}
+                <small style="color: red; display: block; margin-top: 0.25rem;">{{ form.end_time.errors.0 }}</small>
+            {% endif %}
+            <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Must be after start time</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.purpose.id_for_label }}">Purpose of Meeting: *</label>
+            {{ form.purpose }}
+            {% if form.purpose.errors %}
+                <small style="color: red; display: block; margin-top: 0.25rem;">{{ form.purpose.errors.0 }}</small>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn">Book Appointment</button>
+        <a href="{% url 'appointments:list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Available Providers</h3>
+    {% if providers %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Specialization</th>
+                    <th>Bio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for provider in providers %}
+                <tr>
+                    <td><strong>{{ provider.user.get_full_name }}</strong></td>
+                    <td>{{ provider.specialization }}</td>
+                    <td>{{ provider.bio|truncatewords:20 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No providers available. Please contact administrator.</p>
+    {% endif %}
+</div>
+{% endblock %}

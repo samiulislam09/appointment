@@ -1,0 +1,67 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Provider Dashboard{% endblock %}
+
+{% block content %}
+<h1>Welcome, {{ user.first_name }}!</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+    <div class="card">
+        <h3>Total Appointments</h3>
+        <p style="font-size: 2rem; font-weight: bold;">{{ total_appointments }}</p>
+    </div>
+    
+    <div class="card">
+        <h3>Pending</h3>
+        <p style="font-size: 2rem; font-weight: bold; color: #ffc107;">{{ pending_appointments }}</p>
+    </div>
+    
+    <div class="card">
+        <h3>This Week</h3>
+        <p style="font-size: 2rem; font-weight: bold;">{{ this_week_appointments }}</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Upcoming Appointments</h2>
+    {% if upcoming_appointments %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Purpose</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in upcoming_appointments %}
+                <tr>
+                    <td>{{ appointment.customer.user.get_full_name }}</td>
+                    <td>{{ appointment.date }}</td>
+                    <td>{{ appointment.start_time }} - {{ appointment.end_time }}</td>
+                    <td>{{ appointment.purpose|truncatewords:10 }}</td>
+                    <td>
+                        <span class="badge badge-{{ appointment.status }}">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'appointments:detail' appointment.pk %}" class="btn">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No upcoming appointments.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 1rem;">
+    <a href="{% url 'availability:manage' %}" class="btn">Manage Availability</a>
+    <a href="{% url 'appointments:list' %}" class="btn btn-secondary">View All Appointments</a>
+</div>
+{% endblock %}

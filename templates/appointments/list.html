@@ -1,0 +1,66 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Appointments{% endblock %}
+
+{% block content %}
+<h1>My Appointments</h1>
+
+<div class="card">
+    <form method="get" style="margin-bottom: 1rem;">
+        <label for="status">Filter by Status:</label>
+        <select name="status" id="status" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if appointments %}
+        <table>
+            <thead>
+                <tr>
+                    {% if user.role == 'provider' %}
+                        <th>Customer</th>
+                    {% else %}
+                        <th>Provider</th>
+                    {% endif %}
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Purpose</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                    {% if user.role == 'provider' %}
+                        <td>{{ appointment.customer.user.get_full_name }}</td>
+                    {% else %}
+                        <td>{{ appointment.provider.user.get_full_name }}</td>
+                    {% endif %}
+                    <td>{{ appointment.date }}</td>
+                    <td>{{ appointment.start_time }} - {{ appointment.end_time }}</td>
+                    <td>{{ appointment.purpose|truncatewords:15 }}</td>
+                    <td>
+                        <span class="badge badge-{{ appointment.status }}">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'appointments:detail' appointment.pk %}" class="btn">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No appointments found.</p>
+    {% endif %}
+</div>
+
+{% if user.role == 'customer' %}
+    <a href="{% url 'appointments:create' %}" class="btn" style="margin-top: 1rem;">Book New Appointment</a>
+{% endif %}
+{% endblock %}
